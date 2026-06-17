@@ -57,7 +57,10 @@ export default function WristbandScreen({ user }) {
 
       <View style={[styles.statusBadge, { borderColor: accent + '55' }]}>
         <View style={[styles.statusDot, { backgroundColor: colors.success }]} />
-        <Text style={[styles.statusText, { color: accent }]}>PULSEIRA ATIVA</Text>
+        <View>
+          <Text style={[styles.statusText, { color: accent }]}>PULSEIRA ATIVA</Text>
+          <Text style={[styles.statusVersion, { color: accent }]}>{packages[user.package]?.label || user.package}</Text>
+        </View>
       </View>
 
       <Text style={styles.hint}>Apresente este QR code na entrada dos eventos</Text>
@@ -96,5 +99,6 @@ const styles = StyleSheet.create({
   statusBadge: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, paddingHorizontal: 16, paddingVertical: 8, marginBottom: 16 },
   statusDot: { width: 6, height: 6, borderRadius: 3, marginRight: 8 },
   statusText: { fontSize: 10, letterSpacing: 3 },
+  statusVersion: { fontSize: 9, letterSpacing: 2, opacity: 0.6, marginTop: 2 },
   hint: { color: colors.creamDim, fontSize: 11, textAlign: 'center' },
 });
