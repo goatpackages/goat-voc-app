@@ -1,75 +1,163 @@
-import React from 'react';
-import { View, Text, ScrollView, StyleSheet, ImageBackground, TouchableOpacity, Image } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View, Text, ScrollView, StyleSheet, Image,
+  TouchableOpacity, TextInput, ImageBackground,
+} from 'react-native';
 import { colors, packages, radius } from '../../constants/theme';
 import { packagesData, scheduleData, notificationsData, eventoEdicaoLabel } from '../../constants/data';
 
-const heroImages = {
-  BLACK: 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=800&q=80',
+const packageImages = {
+  BLACK:    'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=800&q=80',
   PLATINUM: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80',
-  DIAMOND: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
+  DIAMOND:  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80',
 };
 
-export default function HomeScreen({ user, navigation }) {
+const allPackages = ['BLACK', 'PLATINUM', 'DIAMOND'];
+const categories = ['Todos', 'Residência', 'Festas', 'Atividades', 'Parceiros'];
+
+export default function HomeScreen({ user }) {
+  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('Todos');
   const accent = packages[user.package]?.accent || colors.gold;
-  const pkg = packagesData[user.package];
-  const today = scheduleData[user.package]?.[0];
   const unread = notificationsData.filter(n => !n.read).length;
+  const today = scheduleData[user.package]?.[0];
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
 
-      {/* Hero */}
-      <ImageBackground source={{ uri: heroImages[user.package] }} style={styles.hero} imageStyle={styles.heroImg}>
-        <View style={styles.heroOverlay}>
-          <View style={styles.heroTop}>
-            <Image source={require('../../../assets/logo.png')} style={styles.heroLogo} resizeMode="contain" />
-            {unread > 0 && (
-              <View style={styles.notifBadge}>
-                <Text style={styles.notifBadgeText}>{unread}</Text>
-              </View>
-            )}
-          </View>
-          <View style={styles.heroBottom}>
-            <Text style={styles.heroGreeting}>Olá, {user.name.split(' ')[0]}</Text>
-            <View style={[styles.heroPkgBadge, { borderColor: accent }]}>
-              <Text style={[styles.heroPkgText, { color: accent }]}>{packages[user.package]?.label || user.package}</Text>
-            </View>
-          </View>
-        </View>
-      </ImageBackground>
-
-      {/* Price card */}
-      <View style={[styles.priceCard, { borderColor: accent + '33' }]}>
+      {/* Header */}
+      <View style={styles.header}>
         <View>
-          <Text style={styles.priceLabel}>VALOR DO PACOTE</Text>
-          <Text style={[styles.priceValue, { color: accent }]}>{pkg.price}</Text>
+          <Text style={styles.headerSub}>Bem-vindo de volta</Text>
+          <Text style={styles.headerName}>{user.name.split(' ')[0]} 👋</Text>
         </View>
-        <View style={[styles.pricePill, { backgroundColor: colors.success + '22', borderColor: colors.success + '55' }]}>
-          <View style={[styles.priceDot, { backgroundColor: colors.success }]} />
-          <Text style={[styles.pricePillText, { color: colors.success }]}>CONFIRMADO</Text>
+        <View style={styles.headerRight}>
+          {unread > 0 && (
+            <View style={styles.notifWrap}>
+              <Text style={styles.notifIcon}>🔔</Text>
+              <View style={[styles.notifDot, { backgroundColor: accent }]} />
+            </View>
+          )}
+          <Image source={require('../../../assets/logo.png')} style={styles.logoSmall} resizeMode="contain" />
         </View>
       </View>
 
-      {/* Quick actions */}
-      <View style={styles.quickRow}>
-        <QuickBtn icon="◉" label="Acesso" accent={accent} />
-        <QuickBtn icon="⊕" label="Mapa Rio" accent={accent} />
-        <QuickBtn icon="◇" label="Benefícios" accent={accent} />
-        <QuickBtn icon="◬" label="Avisos" accent={accent} badge={unread} />
+      {/* Search bar */}
+      <View style={styles.searchWrap}>
+        <Text style={styles.searchIcon}>🔍</Text>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Buscar experiências, parceiros..."
+          placeholderTextColor={colors.creamDim}
+          value={search}
+          onChangeText={setSearch}
+        />
+      </View>
+
+      {/* Category chips */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipsRow} contentContainerStyle={styles.chipsContent}>
+        {categories.map(cat => (
+          <TouchableOpacity
+            key={cat}
+            style={[styles.chip, category === cat && { backgroundColor: accent, borderColor: accent }]}
+            onPress={() => setCategory(cat)}
+          >
+            <Text style={[styles.chipText, category === cat && { color: colors.black }]}>{cat}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      {/* Seu pacote — card grande estilo Airbnb */}
+      <View style={styles.section}>
+        <Text style={styles.sectionLabel}>SEU PACOTE</Text>
+        <TouchableOpacity style={styles.mainCard} activeOpacity={0.92}>
+          <ImageBackground
+            source={{ uri: packageImages[user.package] }}
+            style={styles.mainCardPhoto}
+            imageStyle={styles.mainCardPhotoStyle}
+          >
+            <View style={[styles.mainCardBadge, { backgroundColor: accent }]}>
+              <Text style={styles.mainCardBadgeText}>{eventoEdicaoLabel}</Text>
+            </View>
+          </ImageBackground>
+          <View style={styles.mainCardBody}>
+            <View style={styles.mainCardRow}>
+              <Text style={[styles.mainCardTitle, { color: colors.white }]}>
+                {packages[user.package]?.label || user.package}
+              </Text>
+              <View style={[styles.confirmedPill, { borderColor: colors.success + '66' }]}>
+                <View style={[styles.confirmedDot, { backgroundColor: colors.success }]} />
+                <Text style={[styles.confirmedText, { color: colors.success }]}>CONFIRMADO</Text>
+              </View>
+            </View>
+            <Text style={styles.mainCardTagline}>{packagesData[user.package]?.tagline}</Text>
+            <View style={styles.mainCardFooter}>
+              <Text style={[styles.mainCardPrice, { color: accent }]}>{packagesData[user.package]?.price}</Text>
+              <Text style={styles.mainCardSpots}>
+                {packagesData[user.package]?.spotsLeft > 0
+                  ? `${packagesData[user.package]?.spotsLeft} vagas restantes`
+                  : 'Esgotado'}
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      {/* Acesso rápido */}
+      <View style={styles.section}>
+        <Text style={styles.sectionLabel}>ACESSO RÁPIDO</Text>
+        <View style={styles.accessGrid}>
+          <AccessCard icon="◉" label="Pulseira" sub="QR de acesso" accent={accent} />
+          <AccessCard icon="⊕" label="Mapa Rio" sub="Parceiros no mapa" accent={accent} />
+          <AccessCard icon="◇" label="Benefícios" sub="Descontos exclusivos" accent={accent} />
+          <AccessCard icon="◎" label="Agenda" sub="Próximos eventos" accent={accent} />
+        </View>
+      </View>
+
+      {/* Outros pacotes */}
+      <View style={styles.section}>
+        <Text style={styles.sectionLabel}>TODAS AS VERSÕES</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.pkgScroll}>
+          {allPackages.map(pkg => {
+            const pkgAccent = packages[pkg]?.accent || colors.gold;
+            const pkgData = packagesData[pkg];
+            const isActive = pkg === user.package;
+            return (
+              <TouchableOpacity key={pkg} style={[styles.pkgCard, isActive && { borderColor: pkgAccent }]} activeOpacity={0.88}>
+                <ImageBackground
+                  source={{ uri: packageImages[pkg] }}
+                  style={styles.pkgCardPhoto}
+                  imageStyle={styles.pkgCardPhotoStyle}
+                >
+                  {isActive && (
+                    <View style={[styles.pkgCardActiveBadge, { backgroundColor: pkgAccent }]}>
+                      <Text style={styles.pkgCardActiveBadgeText}>Seu pacote</Text>
+                    </View>
+                  )}
+                </ImageBackground>
+                <View style={styles.pkgCardBody}>
+                  <Text style={[styles.pkgCardName, { color: pkgAccent }]}>{packages[pkg]?.label || pkg}</Text>
+                  <Text style={styles.pkgCardTagline} numberOfLines={1}>{pkgData?.tagline}</Text>
+                  <Text style={[styles.pkgCardPrice, { color: pkgAccent }]}>{pkgData?.price}</Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
       </View>
 
       {/* Hoje na agenda */}
       {today && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>HOJE NA AGENDA</Text>
+        <View style={[styles.section, { paddingBottom: 40 }]}>
+          <Text style={styles.sectionLabel}>HOJE NA AGENDA</Text>
           <View style={styles.agendaCard}>
-            <Text style={styles.agendaDate}>{today.day}, {today.date}</Text>
+            <Text style={[styles.agendaDate, { color: accent }]}>{today.day}, {today.date}</Text>
             {today.events.map((evt, i) => (
               <View key={i} style={[styles.agendaItem, i < today.events.length - 1 && styles.agendaItemBorder]}>
                 <Text style={[styles.agendaTime, { color: accent }]}>{evt.time}</Text>
-                <View style={styles.agendaInfo}>
+                <View>
                   <Text style={styles.agendaTitle}>{evt.title}</Text>
-                  <Text style={styles.agendaLocation}>◎  {evt.location}</Text>
+                  <Text style={styles.agendaLocation}>📍 {evt.location}</Text>
                 </View>
               </View>
             ))}
@@ -77,98 +165,82 @@ export default function HomeScreen({ user, navigation }) {
         </View>
       )}
 
-      {/* Vagas */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>SEU PACOTE</Text>
-        <View style={[styles.pkgCard, { borderColor: accent + '33' }]}>
-          <View style={styles.pkgCardTop}>
-            <Text style={[styles.pkgCardName, { color: accent }]}>{packages[user.package]?.label || user.package}</Text>
-            <Text style={styles.pkgCardEdition}>{eventoEdicaoLabel}</Text>
-          </View>
-          <Text style={styles.pkgCardTagline}>{pkg.tagline}</Text>
-          <View style={styles.pkgSpotsRow}>
-            <View style={styles.pkgSpotItem}>
-              <Text style={[styles.pkgSpotNum, { color: accent }]}>{pkg.spots}</Text>
-              <Text style={styles.pkgSpotLabel}>vagas totais</Text>
-            </View>
-            <View style={[styles.pkgSpotDivider, { backgroundColor: accent + '22' }]} />
-            <View style={styles.pkgSpotItem}>
-              <Text style={[styles.pkgSpotNum, { color: pkg.spotsLeft === 0 ? colors.danger : colors.success }]}>
-                {pkg.spotsLeft === 0 ? 'Esgotado' : pkg.spotsLeft}
-              </Text>
-              <Text style={styles.pkgSpotLabel}>{pkg.spotsLeft > 0 ? 'restantes' : ''}</Text>
-            </View>
-          </View>
-        </View>
-      </View>
-
     </ScrollView>
   );
 }
 
-function QuickBtn({ icon, label, accent, badge }) {
+function AccessCard({ icon, label, sub, accent }) {
   return (
-    <View style={styles.quickBtn}>
-      <View style={[styles.quickIcon, { borderColor: accent + '44', backgroundColor: colors.goldDim }]}>
-        <Text style={[styles.quickIconText, { color: accent }]}>{icon}</Text>
-        {badge > 0 && <View style={styles.quickBadge}><Text style={styles.quickBadgeText}>{badge}</Text></View>}
-      </View>
-      <Text style={styles.quickLabel}>{label}</Text>
-    </View>
+    <TouchableOpacity style={styles.accessCard} activeOpacity={0.8}>
+      <Text style={[styles.accessIcon, { color: accent }]}>{icon}</Text>
+      <Text style={styles.accessLabel}>{label}</Text>
+      <Text style={styles.accessSub}>{sub}</Text>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.black },
-  content: { paddingBottom: 40 },
 
-  hero: { height: 280 },
-  heroImg: { filter: undefined },
-  heroOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', padding: 24, justifyContent: 'space-between' },
-  heroTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 },
-  heroLogo: { width: 40, height: 40 },
-  notifBadge: { backgroundColor: colors.gold, borderRadius: 10, minWidth: 20, height: 20, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 5 },
-  notifBadgeText: { color: colors.black, fontSize: 10, fontWeight: '700' },
-  heroBottom: { gap: 8 },
-  heroGreeting: { color: colors.white, fontSize: 28, fontWeight: '300', letterSpacing: 1 },
-  heroPkgBadge: { borderWidth: 1, alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 4 },
-  heroPkgText: { fontSize: 10, letterSpacing: 4, fontWeight: '600' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingTop: 56, paddingBottom: 16 },
+  headerSub: { color: colors.creamDim, fontSize: 12, letterSpacing: 1 },
+  headerName: { color: colors.white, fontSize: 22, fontWeight: '600', marginTop: 2 },
+  headerRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  notifWrap: { position: 'relative' },
+  notifIcon: { fontSize: 20 },
+  notifDot: { position: 'absolute', top: -2, right: -2, width: 8, height: 8, borderRadius: 4 },
+  logoSmall: { width: 32, height: 32, opacity: 0.85 },
 
-  priceCard: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', margin: 16, backgroundColor: colors.card, borderWidth: 1, padding: 18, borderRadius: radius.md },
-  priceLabel: { color: colors.creamDim, fontSize: 9, letterSpacing: 3, marginBottom: 4 },
-  priceValue: { fontSize: 24, fontWeight: '300', letterSpacing: 2 },
-  pricePill: { flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 1, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20 },
-  priceDot: { width: 5, height: 5, borderRadius: 3 },
-  pricePillText: { fontSize: 9, letterSpacing: 2, fontWeight: '600' },
+  searchWrap: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 20, marginBottom: 16, backgroundColor: colors.surface, borderRadius: radius.xl, paddingHorizontal: 16, paddingVertical: 12, borderWidth: 1, borderColor: colors.border, gap: 10 },
+  searchIcon: { fontSize: 16 },
+  searchInput: { flex: 1, color: colors.white, fontSize: 13, letterSpacing: 0.3 },
 
-  quickRow: { flexDirection: 'row', justifyContent: 'space-around', paddingHorizontal: 16, marginBottom: 8 },
-  quickBtn: { alignItems: 'center', gap: 6 },
-  quickIcon: { width: 56, height: 56, borderRadius: radius.md, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  quickIconText: { fontSize: 22 },
-  quickBadge: { position: 'absolute', top: -4, right: -4, backgroundColor: colors.gold, borderRadius: 8, minWidth: 16, height: 16, alignItems: 'center', justifyContent: 'center' },
-  quickBadgeText: { color: colors.black, fontSize: 8, fontWeight: '700' },
-  quickLabel: { color: colors.creamDim, fontSize: 9, letterSpacing: 1 },
+  chipsRow: { maxHeight: 48 },
+  chipsContent: { paddingHorizontal: 20, gap: 8, alignItems: 'center' },
+  chip: { borderWidth: 1, borderColor: colors.border, borderRadius: 20, paddingHorizontal: 16, paddingVertical: 7 },
+  chipText: { color: colors.creamDim, fontSize: 12, letterSpacing: 0.5 },
 
-  section: { paddingHorizontal: 16, marginTop: 24 },
-  sectionTitle: { color: colors.creamDim, fontSize: 9, letterSpacing: 4, marginBottom: 12 },
+  section: { paddingHorizontal: 20, marginTop: 24 },
+  sectionLabel: { color: colors.creamDim, fontSize: 10, letterSpacing: 4, marginBottom: 14 },
+
+  mainCard: { backgroundColor: colors.card, borderRadius: radius.lg, overflow: 'hidden', borderWidth: 1, borderColor: colors.border },
+  mainCardPhoto: { height: 220 },
+  mainCardPhotoStyle: { borderRadius: 0 },
+  mainCardBadge: { position: 'absolute', top: 14, left: 14, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20 },
+  mainCardBadgeText: { color: colors.black, fontSize: 10, fontWeight: '700', letterSpacing: 1 },
+  mainCardBody: { padding: 16 },
+  mainCardRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 },
+  mainCardTitle: { fontSize: 18, fontWeight: '600', letterSpacing: 1 },
+  confirmedPill: { flexDirection: 'row', alignItems: 'center', gap: 5, borderWidth: 1, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12 },
+  confirmedDot: { width: 5, height: 5, borderRadius: 3 },
+  confirmedText: { fontSize: 9, letterSpacing: 1.5, fontWeight: '600' },
+  mainCardTagline: { color: colors.creamDim, fontSize: 12, lineHeight: 18, marginBottom: 14 },
+  mainCardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 12 },
+  mainCardPrice: { fontSize: 20, fontWeight: '300', letterSpacing: 1 },
+  mainCardSpots: { color: colors.creamDim, fontSize: 11 },
+
+  accessGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  accessCard: { width: '47%', backgroundColor: colors.surface, borderRadius: radius.md, padding: 16, borderWidth: 1, borderColor: colors.border },
+  accessIcon: { fontSize: 22, marginBottom: 8 },
+  accessLabel: { color: colors.white, fontSize: 13, fontWeight: '500', marginBottom: 3 },
+  accessSub: { color: colors.creamDim, fontSize: 10, letterSpacing: 0.5 },
+
+  pkgScroll: { gap: 14, paddingRight: 4 },
+  pkgCard: { width: 180, backgroundColor: colors.card, borderRadius: radius.md, overflow: 'hidden', borderWidth: 1, borderColor: colors.border },
+  pkgCardPhoto: { height: 120 },
+  pkgCardPhotoStyle: {},
+  pkgCardActiveBadge: { position: 'absolute', bottom: 10, left: 10, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10 },
+  pkgCardActiveBadgeText: { color: colors.black, fontSize: 9, fontWeight: '700' },
+  pkgCardBody: { padding: 12 },
+  pkgCardName: { fontSize: 12, fontWeight: '600', letterSpacing: 1, marginBottom: 3 },
+  pkgCardTagline: { color: colors.creamDim, fontSize: 10, marginBottom: 8 },
+  pkgCardPrice: { fontSize: 14, fontWeight: '500' },
 
   agendaCard: { backgroundColor: colors.card, borderRadius: radius.md, padding: 16, borderWidth: 1, borderColor: colors.border },
-  agendaDate: { color: colors.gold, fontSize: 10, letterSpacing: 3, marginBottom: 14 },
+  agendaDate: { fontSize: 10, letterSpacing: 3, marginBottom: 14 },
   agendaItem: { flexDirection: 'row', gap: 14, paddingVertical: 10 },
   agendaItemBorder: { borderBottomWidth: 1, borderBottomColor: colors.border },
-  agendaTime: { fontSize: 11, fontWeight: '600', width: 40 },
-  agendaInfo: {},
-  agendaTitle: { color: colors.white, fontSize: 13, marginBottom: 2 },
+  agendaTime: { fontSize: 11, fontWeight: '600', width: 44 },
+  agendaTitle: { color: colors.white, fontSize: 13, marginBottom: 3 },
   agendaLocation: { color: colors.creamDim, fontSize: 11 },
-
-  pkgCard: { backgroundColor: colors.card, borderRadius: radius.md, padding: 18, borderWidth: 1 },
-  pkgCardTop: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
-  pkgCardName: { fontSize: 16, letterSpacing: 4, fontWeight: '600' },
-  pkgCardEdition: { color: colors.creamDim, fontSize: 10, letterSpacing: 2 },
-  pkgCardTagline: { color: colors.cream, fontSize: 12, marginBottom: 16, lineHeight: 18 },
-  pkgSpotsRow: { flexDirection: 'row' },
-  pkgSpotItem: { flex: 1, alignItems: 'center', paddingVertical: 10 },
-  pkgSpotNum: { fontSize: 22, fontWeight: '300' },
-  pkgSpotLabel: { color: colors.creamDim, fontSize: 9, letterSpacing: 2, marginTop: 2 },
-  pkgSpotDivider: { width: 1, marginVertical: 6 },
 });
