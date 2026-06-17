@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "goat-rio-app",
-    "slug": "goat-rio-app",
+    "name": "GOAT VOC APP",
+    "slug": "goat-voc-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
