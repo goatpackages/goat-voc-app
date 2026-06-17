@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet, ImageBackground, TouchableOpacity, Image } from 'react-native';
 import { colors, packages, radius } from '../../constants/theme';
-import { packagesData, scheduleData, notificationsData } from '../../constants/data';
+import { packagesData, scheduleData, notificationsData, eventoEdicaoLabel } from '../../constants/data';
 
 const heroImages = {
   BLACK: 'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=800&q=80',
@@ -83,7 +83,7 @@ export default function HomeScreen({ user, navigation }) {
         <View style={[styles.pkgCard, { borderColor: accent + '33' }]}>
           <View style={styles.pkgCardTop}>
             <Text style={[styles.pkgCardName, { color: accent }]}>{packages[user.package]?.label || user.package}</Text>
-            <Text style={styles.pkgCardEdition}>{pkg.edition}</Text>
+            <Text style={styles.pkgCardEdition}>{eventoEdicaoLabel}</Text>
           </View>
           <Text style={styles.pkgCardTagline}>{pkg.tagline}</Text>
           <View style={styles.pkgSpotsRow}>

@@ -1,6 +1,9 @@
+// Incrementar a cada novo evento realizado
+export const eventoEdicao = 1;
+export const eventoEdicaoLabel = `Edição ${String(eventoEdicao).padStart(2, '0')}`;
+
 export const packagesData = {
   BLACK: {
-    edition: 'Edição 01',
     tagline: 'A experiência completa do Rio.',
     price: 'R$5.990',
     includes: [
@@ -12,7 +15,6 @@ export const packagesData = {
     spotsLeft: 3,
   },
   PLATINUM: {
-    edition: 'Edição 02',
     tagline: 'Premium em todos os detalhes.',
     price: 'R$11.990',
     includes: [
@@ -24,7 +26,6 @@ export const packagesData = {
     spotsLeft: 0,
   },
   DIAMOND: {
-    edition: 'Edição 03',
     tagline: 'O extraordinário como padrão.',
     price: 'A negociar',
     includes: [
