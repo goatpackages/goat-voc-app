@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Linking } from 'react-native';
 import { colors, packages } from '../../constants/theme';
+import { eventoEdicaoLabel } from '../../constants/data';
 
 export default function ProfileScreen({ user, onLogout }) {
   const accent = packages[user.package]?.accent || colors.white;
@@ -20,7 +21,7 @@ export default function ProfileScreen({ user, onLogout }) {
           <Text style={[styles.avatarLetter, { color: accent }]}>{user.name.charAt(0)}</Text>
         </View>
         <Text style={styles.name}>{user.name}</Text>
-        <Text style={[styles.packageBadge, { color: accent, borderColor: accent + '55' }]}>{user.package}</Text>
+        <Text style={[styles.packageBadge, { color: accent, borderColor: accent + '55' }]}>{packages[user.package]?.label || user.package}</Text>
         <Text style={styles.email}>{user.email}</Text>
       </View>
 
@@ -39,7 +40,7 @@ export default function ProfileScreen({ user, onLogout }) {
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>PACOTE</Text>
-          <Text style={styles.infoValue}>{user.package} — {user.package === 'BLACK' ? 'Edição 01' : user.package === 'PLATINUM' ? 'Edição 02' : 'Edição 03'}</Text>
+          <Text style={styles.infoValue}>{packages[user.package]?.label || user.package} — {eventoEdicaoLabel}</Text>
         </View>
       </View>
 
