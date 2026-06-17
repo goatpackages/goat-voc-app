@@ -3,13 +3,14 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform } from '
 import { colors, packages } from '../../constants/theme';
 import { partnersData } from '../../constants/data';
 
-// MapView só disponível em device/emulator com expo-maps configurado
 let MapView, Marker;
 try {
   const Maps = require('react-native-maps');
   MapView = Maps.default;
   Marker = Maps.Marker;
 } catch (_) {}
+
+const RIO_EMBED = 'https://maps.google.com/maps?q=Barra+da+Tijuca,+Rio+de+Janeiro,+Brazil&z=13&output=embed';
 
 export default function MapScreen({ user }) {
   const [selected, setSelected] = useState(null);
@@ -18,7 +19,14 @@ export default function MapScreen({ user }) {
 
   return (
     <View style={styles.container}>
-      {MapView ? (
+      {Platform.OS === 'web' ? (
+        <iframe
+          src={RIO_EMBED}
+          style={{ flex: 1, width: '100%', border: 'none' }}
+          title="Mapa Rio de Janeiro"
+          allowFullScreen
+        />
+      ) : MapView ? (
         <MapView
           style={styles.map}
           initialRegion={{ latitude: -22.9800, longitude: -43.2200, latitudeDelta: 0.12, longitudeDelta: 0.12 }}
@@ -58,7 +66,7 @@ export default function MapScreen({ user }) {
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.legendContent}>
           {available.map(p => (
             <TouchableOpacity key={p.id} style={styles.legendItem} onPress={() => setSelected(p)}>
-              <Text style={styles.legendDot}>●</Text>
+              <Text style={[styles.legendDot, { color: accent }]}>●</Text>
               <Text style={styles.legendName}>{p.name}</Text>
             </TouchableOpacity>
           ))}
@@ -74,7 +82,7 @@ const styles = StyleSheet.create({
   mapPlaceholder: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   mapPlaceholderText: { color: colors.white, fontSize: 16, marginBottom: 8 },
   mapPlaceholderSub: { color: colors.creamDim, fontSize: 12 },
-  popup: { position: 'absolute', bottom: 80, left: 16, right: 16, backgroundColor: colors.surface, padding: 20, borderTopWidth: 2 },
+  popup: { position: 'absolute', bottom: 60, left: 16, right: 16, backgroundColor: colors.surface, padding: 20, borderTopWidth: 2 },
   popupClose: { position: 'absolute', top: 12, right: 16 },
   popupCloseText: { color: colors.creamDim, fontSize: 22 },
   popupCategory: { color: colors.creamDim, fontSize: 9, letterSpacing: 3, marginBottom: 4 },
@@ -85,6 +93,6 @@ const styles = StyleSheet.create({
   legend: { height: 52, borderTopWidth: 1, borderTopColor: colors.border, backgroundColor: colors.black },
   legendContent: { paddingHorizontal: 16, alignItems: 'center', gap: 16 },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  legendDot: { color: colors.gold, fontSize: 10 },
+  legendDot: { fontSize: 10 },
   legendName: { color: colors.creamDim, fontSize: 11 },
 });

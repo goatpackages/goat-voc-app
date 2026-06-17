@@ -52,9 +52,9 @@ export default function HomeScreen({ user, navigation }) {
 
       {/* Quick actions */}
       <View style={styles.quickRow}>
-        <QuickBtn icon="◉" label="Pulseira" accent={accent} />
-        <QuickBtn icon="◎" label="Mapa" accent={accent} />
-        <QuickBtn icon="◇" label="Parceiros" accent={accent} />
+        <QuickBtn icon="◉" label="Acesso" accent={accent} />
+        <QuickBtn icon="⊕" label="Mapa Rio" accent={accent} />
+        <QuickBtn icon="◇" label="Benefícios" accent={accent} />
         <QuickBtn icon="◬" label="Avisos" accent={accent} badge={unread} />
       </View>
 
